@@ -10,16 +10,10 @@ $(document).ready(function(){
         days: []
     };
 
-    $("#nextButton").click(function(){
+    function nextButton(){
         $("#startScreen").hide();
         $("#planningScreen").show();
-      
-
-        // Store the data from the first page into the travelItinerary object
-        travelItinerary.name = $("#nameField").val();
-        travelItinerary.description = $("#descField").val();
-        travelItinerary.startDate = $("#startDateField").val();
-        travelItinerary.endDate = $("#endDateField").val();
+    
 
         document.title = travelItinerary.name || "My generated trip" + (travelItinerary.startDate ? " from " + travelItinerary.startDate : "") + (travelItinerary.endDate ? " to " + travelItinerary.endDate : "");
 
@@ -36,22 +30,58 @@ $(document).ready(function(){
 
         $("#daysContainer").empty();
 
+        // Create the travelItinerary divs
+        var durationDays = travelItinerary.duration;
         for (var i = 0; i < durationDays; i++) {
             var dayDiv = $("<div class='day'><div style='display: flex'><h4 style='width: 100%'>Day " + (i + 1) + " </h4><button class='addButton' style='width: auto'>Add</button></div><hr><div class='travelItinerary'></div></div>");
             $("#daysContainer").append(dayDiv);
         }
 
+        // Load the itinerary items
+        for (var i = 0; i < travelItinerary.days.length; i++) {
+            var dayDiv = $(".day").eq(i);
+            for (var j = 0; j < travelItinerary.days[i].length; j++) {
+                var itinerary = travelItinerary.days[i][j];
+                var itineraryItem = $("<div class='itineraryItem'>" +
+                "<div class='timeBox'>" +
+                "<p class='departureTime'>" + itinerary.departureTime + "</p>" +
+                "<p class='arrivalTime'>" + itinerary.arrivalTime + "</p>" +
+                "</div>" +
+                "<div class='detailsBox'>" +
+                "<p style='font-style:italic'>" + itinerary.toc + " " + "<span>" + itinerary.id + "</span>" + " " + " from " + itinerary.from + " to " + itinerary.to + "</p>" +
+                "<p style='margin-right: 15px'>Note: " + itinerary.note + "</p>" +
+                "</div>" +
+                "<div class='buttonBox'>" +
+                "<button class='editButton'>Edit</button>" +
+                "<button class='deleteButton'>Delete</button>" +
+                "</div>" +
+                "</div>");
+                $(dayDiv).find(".travelItinerary").append(itineraryItem);
+            }
+        }
+
+        // for (var i = 0; i < durationDays; i++) {
+        //     var dayDiv = $("<div class='day'><div style='display: flex'><h4 style='width: 100%'>Day " + (i + 1) + " </h4><button class='addButton' style='width: auto'>Add</button></div><hr><div class='travelItinerary'></div></div>");
+        //     $("#daysContainer").append(dayDiv);
+        // }
+
         $(".addButton").click(function(){
             var id = prompt("Enter ID:");
+            if (id.toLowerCase() === "cancel") {
+                return;
+            }
             var departureTime = prompt("Enter departure time:");
             var arrivalTime = prompt("Enter arrival time:");
 
             while (!/^\d{4}$/.test(departureTime) || !/^\d{4}$/.test(arrivalTime)) {
+                if (departureTime.toLowerCase() === "cancel" || arrivalTime.toLowerCase() === "cancel") {
+                    return;
+                }
                 alert("Invalid input. Please try again.");
                 departureTime = prompt("Enter departure time:");
                 arrivalTime = prompt("Enter arrival time:");
             }
-
+            
             var toc = prompt("Enter TOC:");
             var travelClass = prompt("Enter class:");
             var from = prompt("Enter departure location:");
@@ -163,7 +193,16 @@ $(document).ready(function(){
             });
 
         });
-            
+    }
+
+    $("#nextButton").click(function(){
+        // Store the data from the first page into the travelItinerary object
+        travelItinerary.name = $("#nameField").val();
+        travelItinerary.description = $("#descField").val();
+        travelItinerary.startDate = $("#startDateField").val();
+        travelItinerary.endDate = $("#endDateField").val();
+
+        nextButton();
     });
     $("#backButton").click(function(){
         $("#planningScreen").hide();
@@ -246,19 +285,15 @@ $(document).ready(function(){
         var data = prompt("Enter the JSON data:");
         try {
             travelItinerary = JSON.parse(data);
-            // switch to planning screen
-            $("#startScreen").hide();
-            $("#planningScreen").show();
-            // Set the values of the fields
-            $("#nameField").val(travelItinerary.name);
-            $("#descField").val(travelItinerary.description);
-            $("#startDateField").val(travelItinerary.startDate);
-            $("#endDateField").val(travelItinerary.endDate);
 
             
         } catch (e) {
             alert("Invalid JSON data.");
+            return;
         }
+        
+
+        nextButton();
     });
 
     $('#saveToJson').click(function(){

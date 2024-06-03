@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="script.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container"  id="startScreen">
+        <div class="borderEL">
+            <h1><b>Trip Planning</b></h1>
+            <hr>
+            <div class="cont">
+                <input id="nameField" type="text" name="" placeholder="Name">
+                <textarea id="descField" type="text" name="" placeholder="Description"></textarea>
+                <div class="datefields-container">
+                    <div class="datefields-container">
+                        <div>
+                            <label for="startDateField">Start:</label>
+                            <input id="startDateField" type="date" name="" placeholder="Start Date" class="datefields">
+                        </div>
+                        <div>
+                            <label for="endDateField">End:</label>
+                            <input id="endDateField" type="date" name="" placeholder="End Date" class="datefields">
+                        </div>
+                    </div>
+                </div>
+            <button style="margin-top:20px" id="nextButton">Next >></button>
+        </div>
+    </div>
+</div>
+<div class="container"  id="planningScreen" style="display: none;">
+    <div class="borderEL">
+        <h1><b>Trip Planning</b></h1>
+        <hr>
+        <div class="cont" style="max-width: none; overflow-y: auto; height:100%">
+            <div style="width:100%">
+            <h3>Days</h3>
+            <div class="daysContainer" id="daysContainer">
+
+            </div>
+            </div>
+        </div>
+        <div style="display:flex; width: 100%; gap: 0.5rem">
+            <button style="margin-top:20px" id="backButton"><< Back</button>
+            <button style="margin-top:20px" id="finishButton">Finish >></button>
+        </div>
+    </div>
+</div>
+<div class="container"  id="finalScreen" style="display: none;">
+    <div style="height: 100%; width: 100%; display: flex; flex-direction: column;">
+        <div style="height: 100%; margin-left: 2rem; margin-right: 2rem;" id="tableSection">
+            <div style="display:flex; gap: 2rem;">
+                <div style="width:100%">
+                    <h2 style="margin-bottom: 0; font-size:14px" id="printTitle"></h2>
+                    <h3 style="font-weight: 400; margin-top: 5px; font-size: 10px;" id="printDescription"></h3>
+                </div>
+                <div style="width: 30%; display:flex; gap: 2rem; align-items: center; justify-content: center;">
+                    <h3 style="font-size: 12px" id="printDays"></h3>
+                    <div>
+                        <h4 style="margin: 0; font-weight: 400; font-size:12px" id="printDateFrom"></h4>
+                        <h4 style="margin: 0; font-weight: 400; font-size:12px" id="printDateTo"></h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div style="display:flex; width: 100%; gap: 0.5rem; padding-bottom: 1rem;" id="printNavigationButtons" class="no-print">
+            <button style="margin-top:20px; margin-left: 1rem;" id="backToPlanningButton"><< Back</button>
+            <button style="margin-top:20px; margin-right: 1rem;" id="printButton">Print</button>
+        </div>
+    </div>
+
+</div>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            height: 100vh;
+            width: 100vw;
+            margin: 0;  
+        }
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            height: 100vh;
+        }
+        .borderEL {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            border: 1px solid rgb(10,10,10);
+            padding: 1rem;
+            width: 70%;
+            height: 90vh;
+            max-width: 900px;
+        }
+        .border h1{
+            font-size: 2rem;
+        }
+        hr{
+            width: 100%;
+            border: 0;
+            background: black;
+            height: 1px;
+        }
+        .borderEL .cont{
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            max-width: 500px;
+            margin-top: 1.5rem;
+        }
+        .cont input, .cont textarea{
+            padding: 0.5rem;
+            margin: 0.5rem;
+            border: 1px solid black;
+            border-radius: 5px;
+            font-size: 24px;
+            width: 95%;
+        }
+        .cont textarea{
+            font-family: 'Roboto', sans-serif;  
+            font-size: 14px;
+            height: 120px;
+            resize: none;
+        }
+
+        @media screen and (max-width: 600px){
+            .borderEL{
+            width: 85%;
+            }
+        }
+
+        .datefields{
+            font-size: 14px !important;
+        }
+
+        .datefields-container{
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .datefields-container div{
+            display: flex;
+            align-items: center;
+        }
+
+        button{
+            appearance: none;
+            border: 0;
+            background: rgb(22, 103, 253);
+            color: white;
+            padding: 0.5rem;
+            padding-left: 0.7rem;
+            padding-right: 0.7rem;
+            font-size: 18px;
+            border-radius: 0.2rem;
+            width: 100%;
+        }
+        button:hover{
+            background:rgb(20, 90, 219);
+            cursor: pointer;
+        }
+
+        .deleteButton{
+            background: rgb(190, 0, 0);
+        }
+
+        .deleteButton:hover{
+            background: rgb(160, 0, 0);
+        }
+
+        .daysContainer:first-child{
+            margin-top: 1rem;
+        }
+        
+        .day{
+            border: 1px solid rgb(119, 119, 119);
+            padding: 0.5rem;
+            border-radius: 5px;
+            margin-top: 0.5rem;
+        }
+
+        .day h4{
+            font-weight: 400;
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+
+        .itineraryItem {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border: 1px solid #ccc;
+            margin-bottom: 10px;
+        }
+        .timeBox {
+            flex-basis: auto; 
+            margin-right: 20px;
+        }
+        .timeBox p {
+            font-weight: bold;
+            font-size: 18px;
+        }
+        .detailsBox {
+            flex-grow: 1;
+        }
+        .detailsBox p {
+            text-align: left;
+        }
+        .buttonBox {
+            display: flex;
+            justify-content: flex-end;
+        }
+        .editButton, .deleteButton {
+            margin-left: 10px;
+        }
+
+        @media print {
+            .no-print {
+                display: none !important;
+            }
+        }
+
+        table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 20px;
+        }
+
+        table, th, td {
+        border: 1px solid #ddd;
+        }
+
+        th, td {
+        text-align: left;
+        padding: 5px;
+        }
+
+        th {
+        background-color: #1b1b1b;
+        color: white;
+        }
+
+        tr:nth-child(even) {
+        background-color: #f2f2f2;
+        }
+
+        .short {
+        width: 7%;
+        }
+
+        .long {
+        width: 20%;
+        }
+
+        .note{
+            width: 40%;
+        }
+    
+    </style>
+</body>
+</html>
+

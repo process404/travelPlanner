@@ -262,7 +262,7 @@ $(document).ready(function(){
         table.append(spareRowTitle);
 
         // Add 8 empty rows
-        for (var i = 0; i < 50; i++) {
+        for (var i = 0; i < 12; i++) {
             var emptyRow = $('<tr>');
             emptyRow.append('<td class="short space"></td>');
             emptyRow.append('<td class="short space"></td>');

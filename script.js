@@ -60,6 +60,62 @@ $(document).ready(function(){
             }
         }
 
+        $(".editButton").click(function(){
+            // Prompt the user to edit the information
+            var id = prompt("Enter ID:", id);
+            var departureTime = prompt("Enter departure time:", departureTime);
+            var arrivalTime = prompt("Enter arrival time:", arrivalTime);
+            var toc = prompt("Enter TOC:", toc);
+            var from = prompt("Enter departure location:", from);
+            var to = prompt("Enter arrival location:", to);
+            var travelClass = prompt("Enter class:", travelClass);
+            var note = prompt("Enter a note:", note);
+        
+            // Get the index of the current day div
+            var dayIndex = $(this).closest('.day').index();
+        
+            // Get the index of the current itinerary item
+            var itemIndex = $(this).closest('.itineraryItem').index();
+        
+            // Update the information in the travelItinerary.days array
+            travelItinerary.days[dayIndex][itemIndex] = {
+                id: id,
+                departureTime: departureTime,
+                arrivalTime: arrivalTime,
+                toc: toc,
+                from: from,
+                to: to,
+                class: travelClass,
+                note: note
+            };
+        
+            // Update the information in the itineraryItem div
+            var itineraryItem = $(this).closest('.itineraryItem');
+            itineraryItem.find('.departureTime').text(departureTime);
+            itineraryItem.find('.arrivalTime').text(arrivalTime);
+            itineraryItem.find('.detailsBox p:first').html(`${toc} <span>${id}</span> from ${from} to ${to}`);
+            itineraryItem.find('.detailsBox p:last').text(`Note: ${note}`);
+        });
+
+        $(".deleteButton").click(function(){
+            // Show a confirmation dialog
+            if (!confirm("Are you sure you want to delete this item?")) {
+                return;
+            }
+
+            // Get the index of the current day div
+            var dayIndex = $(this).closest('.day').index();
+
+            // Get the index of the current itinerary item
+            var itemIndex = $(this).closest('.itineraryItem').index();
+
+            // Remove the itinerary item from the travelItinerary.days array
+            travelItinerary.days[dayIndex].splice(itemIndex, 1);
+
+            // Remove the itinerary item from the travelIternary div
+            $(this).closest('.itineraryItem').remove();
+        });
+
         // for (var i = 0; i < durationDays; i++) {
         //     var dayDiv = $("<div class='day'><div style='display: flex'><h4 style='width: 100%'>Day " + (i + 1) + " </h4><button class='addButton' style='width: auto'>Add</button></div><hr><div class='travelItinerary'></div></div>");
         //     $("#daysContainer").append(dayDiv);
@@ -140,57 +196,8 @@ $(document).ready(function(){
             // Append the new div element to the travelItinerary div within the current day div
             $(this).closest('.day').find('.travelItinerary').append(itineraryItem);
 
-            $(".editButton").click(function(){
-                // Prompt the user to edit the information
-                var id = prompt("Enter ID:", id);
-                var departureTime = prompt("Enter departure time:", departureTime);
-                var arrivalTime = prompt("Enter arrival time:", arrivalTime);
-                var toc = prompt("Enter TOC:", toc);
-                var travelClass = prompt("Enter class:", travelClass);
-                var from = prompt("Enter departure location:", from);
-                var to = prompt("Enter arrival location:", to);
-                var note = prompt("Enter a note:", note);
-            
-                // Get the index of the current day div
-                var dayIndex = $(this).closest('.day').index();
-            
-                // Get the index of the current itinerary item
-                var itemIndex = $(this).closest('p').index();
-            
-                // Update the information in the travelItinerary.days array
-                travelItinerary.days[dayIndex][itemIndex] = {
-                    id: id,
-                    departureTime: departureTime,
-                    arrivalTime: arrivalTime,
-                    toc: toc,
-                    class: travelClass,
-                    from: from,
-                    to: to,
-                    note: note
-                };
-            
-                 // Update the information in the travelIternary div
-                $(this).parent().html("<div class='timeBox'><p>" + departureTime + "</p><p>" + arrivalTime + "</p></div><div class='detailsBox'><p>" + id + " " + toc + " " + travelClass + " from " + from + " to " + to + "</p><p>Note: " + note + "</p></div><button class='editButton'>Edit</button><button class='deleteButton'>Delete</button>");
-            });
+            nextButton();
 
-            $(".deleteButton").click(function(){
-                // Show a confirmation dialog
-                if (!confirm("Are you sure you want to delete this item?")) {
-                    return;
-                }
-
-                // Get the index of the current day div
-                var dayIndex = $(this).closest('.day').index();
-
-                // Get the index of the current itinerary item
-                var itemIndex = $(this).closest('.itineraryItem').index();
-
-                // Remove the itinerary item from the travelItinerary.days array
-                travelItinerary.days[dayIndex].splice(itemIndex, 1);
-
-                // Remove the itinerary item from the travelIternary div
-                $(this).closest('.itineraryItem').remove();
-            });
 
         });
     }
@@ -227,7 +234,7 @@ $(document).ready(function(){
         $("#tableSection table").remove();
 
         var table = $('<table>');
-        table.append('<tr><th class="short">ID</th><th class="short">DEP</th><th class="short">ARR</th><th class="long">FROM</th><th class="long">TO</th><th class="short">TOC</th><th class="short">CLASS</th><th class="long">NOTE</th></tr>');
+        table.append('<tr><th class="short">ID</th><th class="short">DEP</th><th class="short">ARR</th><th class="long">FROM</th><th class="long">TO</th><th class="short">TOC</th><th class="long">NOTE</th></tr>');
         var dayNumber = 1;
         travelItinerary.days.forEach(function(day) {
             // Add a row at the start of each day's itineraries
@@ -235,20 +242,37 @@ $(document).ready(function(){
             table.append(dayRow);
         
             day.forEach(function(itinerary) {
-                var row = $('<tr>');
-                row.append('<td class="short">' + itinerary.id + '</td>');
-                row.append('<td class="short">' + itinerary.departureTime + '</td>');
-                row.append('<td class="short">' + itinerary.arrivalTime + '</td>');
-                row.append('<td class="long">' + itinerary.from + '</td>');
-                row.append('<td class="long">' + itinerary.to + '</td>');
-                row.append('<td class="short">' + itinerary.toc + '</td>');
-                // row.append('<td class="short">' + itinerary.class + '</td>');
-                row.append('<td class="note">' + itinerary.note + '</td>');
-                table.append(row);
+            var row = $('<tr>');
+            row.append('<td class="short">' + itinerary.id + '</td>');
+            row.append('<td class="short">' + itinerary.departureTime + '</td>');
+            row.append('<td class="short">' + itinerary.arrivalTime + '</td>');
+            row.append('<td class="long">' + itinerary.from + '</td>');
+            row.append('<td class="long">' + itinerary.to + '</td>');
+            row.append('<td class="short">' + itinerary.toc + '</td>');
+            // row.append('<td class="short">' + itinerary.class + '</td>');
+            row.append('<td class="note">' + itinerary.note + '</td>');
+            table.append(row);
             });
         
             dayNumber++;
         });
+
+        // Add a row for the spare row title
+        var spareRowTitle = $('<tr>').append('<td colspan="8">Spare Row</td>');
+        table.append(spareRowTitle);
+
+        // Add 8 empty rows
+        for (var i = 0; i < 50; i++) {
+            var emptyRow = $('<tr>');
+            emptyRow.append('<td class="short space"></td>');
+            emptyRow.append('<td class="short space"></td>');
+            emptyRow.append('<td class="short space"></td>');
+            emptyRow.append('<td class="long space"></td>');
+            emptyRow.append('<td class="long space"></td>');
+            emptyRow.append('<td class="short space"></td>');
+            emptyRow.append('<td class="long space"></td>');
+            table.append(emptyRow);
+        }
 
 
 

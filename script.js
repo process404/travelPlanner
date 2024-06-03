@@ -10,9 +10,6 @@ $(document).ready(function(){
         days: []
     };
 
-    $("#startScreen").hide();
-    $("#finalScreen").show();
-
     $("#nextButton").click(function(){
         $("#startScreen").hide();
         $("#planningScreen").show();
@@ -265,9 +262,20 @@ $(document).ready(function(){
     });
 
     $('#saveToJson').click(function(){
-        alert("Copy the JSON data coming next");
-        var data = JSON.stringify(travelItinerary);
-        alert(data);
+        $('#saveToJson').text("Copied!")
+        var jsonString = JSON.stringify(travelItinerary);
+        navigator.clipboard.writeText(jsonString)
+            .then(function() {
+            $('#saveToJson').text("Copied!");
+            })
+            .catch(function(error) {
+            console.error("Failed to copy JSON data to clipboard: ", error);
+            });
 
+        setTimeout(() => {
+            $('#saveToJson').text("Copy as string");
+        }, 5000);
+
+            
     });
 });

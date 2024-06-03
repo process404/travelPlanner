@@ -29,6 +29,7 @@
                     </div>
                 </div>
             <button style="margin-top:20px" id="nextButton">Next >></button>
+            <button style="margin-top:7px" class="loadButton" id="loadButton">Load from string</button>
         </div>
     </div>
 </div>
@@ -53,11 +54,28 @@
 <div class="container"  id="finalScreen" style="display: none;">
     <div style="height: 100%; width: 100%; display: flex; flex-direction: column;">
         <div style="height: 100%; margin-left: 2rem; margin-right: 2rem;" id="tableSection">
-
+            <div style="display: flex; justify-content: space-between; margin-top: 0.5rem; margin-bottom: 0.5rem;">
+                <div>
+                    <h2 style="margin:0; font-size: 14px;" id="printTitle"></h2>
+                    <h4 style="margin:0; margin-top:5px; font-weight:400; font-size: 10px;" id="printDescription"></h4>
+                </div>
+                <div style="display: flex; gap: 4rem;">
+                    <div>
+                        <h2 style="margin:0; font-size: 10px;" id="printDuration"></h2>
+                    </div>
+                    <div>
+                        <h3 style="margin:0; font-weight: 400; font-size: 12px" id="printFrom"></h3>
+                        <h3 style="margin:0; font-weight: 400; font-size: 12px" id="printTo"></h3>
+                    </div>
+                </div>
+            </div>
         </div>
         <div style="display:flex; width: 100%; gap: 0.5rem; padding-bottom: 1rem;" id="printNavigationButtons" class="no-print">
-            <button style="margin-top:20px; margin-left: 1rem;" id="backToPlanningButton"><< Back</button>
-            <button style="margin-top:20px; margin-right: 1rem;" id="printButton">Print</button>
+            <button style="margin-top:20px; margin-left: 1rem; width: 30%;" id="backToPlanningButton"><< Back</button>
+            <div style="display: flex; width: 100%">
+                <button style="margin-top:20px; margin-right: 1rem;" class="saveButton" id="saveToJson">Save to string</button>
+                <button style="margin-top:20px; margin-right: 1rem;" id="printButton">Print</button>
+            </div>
         </div>
     </div>
 
@@ -162,6 +180,20 @@
 
         .deleteButton:hover{
             background: rgb(160, 0, 0);
+        }
+
+        .loadButton{
+            background: rgb(0, 170, 0);
+        }
+        .loadButton:hover{
+            background: rgb(0, 150, 0);
+        }
+
+        .saveButton{
+            background: rgb(0, 170, 0);
+        }
+        .saveButton:hover{
+            background: rgb(0, 150, 0);
         }
 
         .daysContainer:first-child{

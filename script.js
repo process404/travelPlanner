@@ -10,6 +10,9 @@ $(document).ready(function(){
         days: []
     };
 
+    $("#startScreen").hide();
+    $("#finalScreen").show();
+
     $("#nextButton").click(function(){
         $("#startScreen").hide();
         $("#planningScreen").show();
@@ -176,6 +179,15 @@ $(document).ready(function(){
             return;
         }
 
+        // Set the id's for the print elements
+        $("#printTitle").text(travelItinerary.name.toUpperCase() || "MY GENERATED TRIP");
+        $("#printDescription").text((travelItinerary.description.toUpperCase() || "GENERATED " + new Date().toLocaleDateString()) + " " + new Date().toLocaleTimeString());
+        $("#printDuration").text(travelItinerary.duration + " DAYS");
+        $("#printFrom").text(travelItinerary.startDate.toUpperCase());
+        $("#printTo").text(travelItinerary.endDate.toUpperCase());
+
+        
+
         $("#tableSection table").remove();
 
         var table = $('<table>');
@@ -209,12 +221,6 @@ $(document).ready(function(){
         $("#planningScreen").hide();
         $("#finalScreen").show();
 
-        // Set the id's for the print elements
-        $("#printTitle").text(travelItinerary.name.toUpperCase() || "MY GENERATED TRIP");
-        $("#printDescription").text((travelItinerary.description.toUpperCase() || "GENERATED " + new Date().toLocaleDateString()) + " " + new Date().toLocaleTimeString());
-        $("#printDuration").text(travelItinerary.duration + " DAYS");
-        $("#printFrom").text(travelItinerary.startDate.toUpperCase());
-        $("#printTo").text(travelItinerary.endDate.toUpperCase());
 
 
 
@@ -237,5 +243,31 @@ $(document).ready(function(){
             // After printing, show the buttons again
             $('#printNavigationButtons').removeClass('hidden');
         }, 0);
+    });
+
+    $('#loadButton').click(function(){
+        var data = prompt("Enter the JSON data:");
+        try {
+            travelItinerary = JSON.parse(data);
+            // switch to planning screen
+            $("#startScreen").hide();
+            $("#planningScreen").show();
+            // Set the values of the fields
+            $("#nameField").val(travelItinerary.name);
+            $("#descField").val(travelItinerary.description);
+            $("#startDateField").val(travelItinerary.startDate);
+            $("#endDateField").val(travelItinerary.endDate);
+
+            
+        } catch (e) {
+            alert("Invalid JSON data.");
+        }
+    });
+
+    $('#saveToJson').click(function(){
+        alert("Copy the JSON data coming next");
+        var data = JSON.stringify(travelItinerary);
+        alert(data);
+
     });
 });

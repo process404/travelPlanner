@@ -13,12 +13,15 @@ $(document).ready(function(){
     $("#nextButton").click(function(){
         $("#startScreen").hide();
         $("#planningScreen").show();
+      
 
         // Store the data from the first page into the travelItinerary object
         travelItinerary.name = $("#nameField").val();
         travelItinerary.description = $("#descField").val();
         travelItinerary.startDate = $("#startDateField").val();
         travelItinerary.endDate = $("#endDateField").val();
+
+        document.title = travelItinerary.name || "My generated trip" + (travelItinerary.startDate ? " from " + travelItinerary.startDate : "") + (travelItinerary.endDate ? " to " + travelItinerary.endDate : "");
 
         var startDate = new Date(travelItinerary.startDate);
         var endDate = new Date(travelItinerary.endDate);
@@ -173,21 +176,30 @@ $(document).ready(function(){
             return;
         }
 
+        $("#tableSection table").remove();
+
         var table = $('<table>');
         table.append('<tr><th class="short">ID</th><th class="short">DEP</th><th class="short">ARR</th><th class="long">FROM</th><th class="long">TO</th><th class="short">TOC</th><th class="short">CLASS</th><th class="long">NOTE</th></tr>');
+        var dayNumber = 1;
         travelItinerary.days.forEach(function(day) {
+            // Add a row at the start of each day's itineraries
+            var dayRow = $('<tr>').append('<td colspan="8">Day ' + dayNumber + '</td>');
+            table.append(dayRow);
+        
             day.forEach(function(itinerary) {
-            var row = $('<tr>');
-            row.append('<td class="short">' + itinerary.id + '</td>');
-            row.append('<td class="short">' + itinerary.departureTime + '</td>');
-            row.append('<td class="short">' + itinerary.arrivalTime + '</td>');
-            row.append('<td class="long">' + itinerary.from + '</td>');
-            row.append('<td class="long">' + itinerary.to + '</td>');
-            row.append('<td class="short">' + itinerary.toc + '</td>');
-            // row.append('<td class="short">' + itinerary.class + '</td>');
-            row.append('<td class="note">' + itinerary.note + '</td>');
-            table.append(row);
+                var row = $('<tr>');
+                row.append('<td class="short">' + itinerary.id + '</td>');
+                row.append('<td class="short">' + itinerary.departureTime + '</td>');
+                row.append('<td class="short">' + itinerary.arrivalTime + '</td>');
+                row.append('<td class="long">' + itinerary.from + '</td>');
+                row.append('<td class="long">' + itinerary.to + '</td>');
+                row.append('<td class="short">' + itinerary.toc + '</td>');
+                // row.append('<td class="short">' + itinerary.class + '</td>');
+                row.append('<td class="note">' + itinerary.note + '</td>');
+                table.append(row);
             });
+        
+            dayNumber++;
         });
 
 
@@ -196,6 +208,13 @@ $(document).ready(function(){
 
         $("#planningScreen").hide();
         $("#finalScreen").show();
+
+        // Set the id's for the print elements
+        $("#printTitle").text(travelItinerary.name.toUpperCase() || "MY GENERATED TRIP");
+        $("#printDescription").text((travelItinerary.description.toUpperCase() || "GENERATED " + new Date().toLocaleDateString()) + " " + new Date().toLocaleTimeString());
+        $("#printDuration").text(travelItinerary.duration + " DAYS");
+        $("#printFrom").text(travelItinerary.startDate.toUpperCase());
+        $("#printTo").text(travelItinerary.endDate.toUpperCase());
 
 
 
@@ -211,13 +230,6 @@ $(document).ready(function(){
     $('#printButton').click(function(){
         document.title = travelItinerary.name || "My generated trip" + (travelItinerary.startDate ? " from " + travelItinerary.startDate : "") + (travelItinerary.endDate ? " to " + travelItinerary.endDate : "");
         $('#printNavigationButtons').addClass('hidden');
-
-        // Set the id's for the print elements
-        $("#printTitle").text(travelItinerary.name.toUpperCase() || "MY GENERATED TRIP");
-        $("#printDescription").text(travelItinerary.description.toUpperCase() || "GENERATED " + new Date().toLocaleDateString());
-        $("#printDuration").text(travelItinerary.duration + " DAYS");
-        $("#printFrom").text(travelItinerary.startDate.toUpperCase());
-        $("#printTo").text(travelItinerary.endDate.toUpperCase());
         
         // Delay the print command
         setTimeout(function() {

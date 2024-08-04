@@ -35,7 +35,10 @@
 </div>
 <div class="container"  id="planningScreen" style="display: none;">
     <div class="borderEL">
-        <h1><b>Trip Planning</b></h1>
+        <div style="display: flex; width: 100%; justify-content: space-between; align-items: center;">
+            <h1 style="width:100%"><b>Trip Planning</b></h1>
+            <button id="startNewButton" class="startNewButton"><< Start New</button>
+        </div>
         <hr>
         <div class="cont" style="max-width: none; overflow-y: auto; height:100%">
             <div style="width:100%">
@@ -180,6 +183,19 @@
 
         .deleteButton:hover{
             background: rgb(160, 0, 0);
+        }
+
+        .startNewButton{
+            background: rgb(29, 29, 29);
+            width: 150px
+        }
+
+        .startNewButton:hover{
+            background: rgb(160, 0, 0);
+        }
+
+        .startNewButton{
+            font-size: 0.8em;
         }
 
         .loadButton{

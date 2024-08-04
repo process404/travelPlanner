@@ -10,6 +10,37 @@ $(document).ready(function(){
         days: []
     };
 
+    if (localStorage.getItem("travelItinerary")) {
+        travelItinerary = JSON.parse(localStorage.getItem("travelItinerary"));
+        $("#nameField").val(travelItinerary.name);
+        $("#descField").val(travelItinerary.description);
+        $("#startDateField").val(travelItinerary.startDate);
+        $("#endDateField").val(travelItinerary.endDate);
+        nextButton();
+    }
+
+    function startNewButton(){
+        travelItinerary = {
+            name: "",
+            description: "",
+            duration: "",
+            startDate: "",
+            endDate: "",
+            days: []
+        }
+
+        $("#nameField").val(travelItinerary.name);
+        $("#descField").val(travelItinerary.description);
+        $("#startDateField").val(travelItinerary.startDate);
+        $("#endDateField").val(travelItinerary.endDate);
+
+        localStorage.clear();
+
+        $("#planningScreen").hide();
+        $("#startScreen").show();
+    }
+    
+
     function nextButton(){
         $("#startScreen").hide();
         $("#planningScreen").show();
@@ -95,6 +126,13 @@ $(document).ready(function(){
             itineraryItem.find('.arrivalTime').text(arrivalTime);
             itineraryItem.find('.detailsBox p:first').html(`${toc} <span>${id}</span> from ${from} to ${to}`);
             itineraryItem.find('.detailsBox p:last').text(`Note: ${note}`);
+        });
+
+        $(".startNewButton").click(function(){
+            if (!confirm("Are you sure you want to start a new itinerary?")) {
+                return;
+            }
+            startNewButton();
         });
 
         $(".deleteButton").click(function(){
@@ -224,7 +262,7 @@ $(document).ready(function(){
 
         // Set the id's for the print elements
         $("#printTitle").text(travelItinerary.name.toUpperCase() || "MY GENERATED TRIP");
-        $("#printDescription").text((travelItinerary.description.toUpperCase() || "GENERATED " + new Date().toLocaleDateString()) + " " + new Date().toLocaleTimeString());
+        $("#printDescription").text((travelItinerary.description.toUpperCase() || "GENERATED " + new Date().toLocaleDateString()));
         $("#printDuration").text(travelItinerary.duration + " DAYS");
         $("#printFrom").text(travelItinerary.startDate.toUpperCase());
         $("#printTo").text(travelItinerary.endDate.toUpperCase());
@@ -281,6 +319,9 @@ $(document).ready(function(){
         $("#planningScreen").hide();
         $("#finalScreen").show();
 
+        // Store travelItinerary in localStorage
+        localStorage.setItem('travelItinerary', JSON.stringify(travelItinerary));
+
 
 
 
@@ -309,6 +350,12 @@ $(document).ready(function(){
         var data = prompt("Enter the JSON data:");
         try {
             travelItinerary = JSON.parse(data);
+            localStorage.setItem('travelItinerary', JSON.stringify(travelItinerary));
+            $("#nameField").val(travelItinerary.name);
+            $("#descField").val(travelItinerary.description);
+            $("#startDateField").val(travelItinerary.startDate);
+            $("#endDateField").val(travelItinerary.endDate);
+
 
             
         } catch (e) {

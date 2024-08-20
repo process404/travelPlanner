@@ -19,6 +19,15 @@ $(document).ready(function(){
         nextButton();
     }
 
+    function sortJourneysByStartTime() {
+        for (var i = 0; i < travelItinerary.days.length; i++) {
+            travelItinerary.days[i].sort(function(a, b) {
+                return a.departureTime.localeCompare(b.departureTime);
+            });
+        }
+    }
+
+
     function startNewButton(){
         travelItinerary = {
             name: "",
@@ -44,6 +53,9 @@ $(document).ready(function(){
     function nextButton(){
         $("#startScreen").hide();
         $("#planningScreen").show();
+
+        sortJourneysByStartTime();
+        updateUI();
     
 
         document.title = travelItinerary.name || "My generated trip" + (travelItinerary.startDate ? " from " + travelItinerary.startDate : "") + (travelItinerary.endDate ? " to " + travelItinerary.endDate : "");
@@ -91,7 +103,7 @@ $(document).ready(function(){
             }
         }
 
-        $(".editButton").click(function(){
+        function editButtonHandler(){
             // Prompt the user to edit the information
             var id = prompt("Enter ID:", id);
             var departureTime = prompt("Enter departure time:", departureTime);
@@ -126,7 +138,51 @@ $(document).ready(function(){
             itineraryItem.find('.arrivalTime').text(arrivalTime);
             itineraryItem.find('.detailsBox p:first').html(`${toc} <span>${id}</span> from ${from} to ${to}`);
             itineraryItem.find('.detailsBox p:last').text(`Note: ${note}`);
-        });
+
+            this.sortJourneysByStartTime();
+            this.updateUI();
+        };
+
+        $(".editButton").click(editButtonHandler);
+
+        function updateUI() {
+            $("#daysContainer").empty();
+        
+            // Create the travelItinerary divs
+            var durationDays = travelItinerary.duration;
+            for (var i = 0; i < durationDays; i++) {
+                var dayDiv = $("<div class='day'><div style='display: flex'><h4 style='width: 100%'>Day " + (i + 1) + " </h4><button class='addButton' style='width: auto'>Add</button></div><hr><div class='travelItinerary'></div></div>");
+                $("#daysContainer").append(dayDiv);
+            }
+        
+            // Load the itinerary items
+            for (var i = 0; i < travelItinerary.days.length; i++) {
+                var dayDiv = $(".day").eq(i);
+                for (var j = 0; j < travelItinerary.days[i].length; j++) {
+                    var itinerary = travelItinerary.days[i][j];
+                    var itineraryItem = $("<div class='itineraryItem'>" +
+                    "<div class='timeBox'>" +
+                    "<p class='departureTime'>" + itinerary.departureTime + "</p>" +
+                    "<p class='arrivalTime'>" + itinerary.arrivalTime + "</p>" +
+                    "</div>" +
+                    "<div class='detailsBox'>" +
+                    "<p style='font-style:italic'>" + itinerary.toc + " " + "<span>" + itinerary.id + "</span>" + " " + " from " + itinerary.from + " to " + itinerary.to + "</p>" +
+                    "<p style='margin-right: 15px'>Note: " + itinerary.note + "</p>" +
+                    "</div>" +
+                    "<div class='buttonBox'>" +
+                    "<button class='editButton'>Edit</button>" +
+                    "<button class='deleteButton'>Delete</button>" +
+                    "</div>" +
+                    "</div>");
+                    $(dayDiv).find(".travelItinerary").append(itineraryItem);
+                }
+            }
+        
+            // Reattach event handlers
+            $(".editButton").click(editButtonHandler);
+            $(".deleteButton").click(deleteButtonHandler);
+            $(".addButton").click(addButtonHandler);
+        }
 
         $(".startNewButton").click(function(){
             if (!confirm("Are you sure you want to start a new itinerary?")) {
@@ -135,31 +191,37 @@ $(document).ready(function(){
             startNewButton();
         });
 
-        $(".deleteButton").click(function(){
+        
+        function deleteButtonHandler(){
             // Show a confirmation dialog
             if (!confirm("Are you sure you want to delete this item?")) {
                 return;
             }
-
+            
             // Get the index of the current day div
             var dayIndex = $(this).closest('.day').index();
-
+            
             // Get the index of the current itinerary item
             var itemIndex = $(this).closest('.itineraryItem').index();
-
+            
             // Remove the itinerary item from the travelItinerary.days array
             travelItinerary.days[dayIndex].splice(itemIndex, 1);
-
+            
             // Remove the itinerary item from the travelIternary div
             $(this).closest('.itineraryItem').remove();
-        });
+            sortJourneysByStartTime();
+            updateUI();
+        };
+        
+        $(".deleteButton").click(deleteButtonHandler);
 
         // for (var i = 0; i < durationDays; i++) {
         //     var dayDiv = $("<div class='day'><div style='display: flex'><h4 style='width: 100%'>Day " + (i + 1) + " </h4><button class='addButton' style='width: auto'>Add</button></div><hr><div class='travelItinerary'></div></div>");
         //     $("#daysContainer").append(dayDiv);
         // }
 
-        $(".addButton").click(function(){
+        $('.addButton').click(addButtonHandler);    
+        function addButtonHandler(){
             var id = prompt("Enter ID:");
             if (id.toLowerCase() === "cancel") {
                 return;
@@ -237,8 +299,10 @@ $(document).ready(function(){
             nextButton();
 
 
-        });
+
+        };
     }
+
 
     $("#nextButton").click(function(){
         // Store the data from the first page into the travelItinerary object
@@ -381,7 +445,7 @@ $(document).ready(function(){
         setTimeout(() => {
             $('#saveToJson').text("Copy as string");
         }, 5000);
-
-            
+   
     });
+
 });

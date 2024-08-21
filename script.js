@@ -106,14 +106,60 @@ $(document).ready(function(){
         function editButtonHandler(){
             // Prompt the user to edit the information
             var id = prompt("Enter ID:", id);
+            if (id.toLowerCase() === "cancel") {
+                return;
+            }
             var departureTime = prompt("Enter departure time:", departureTime);
+            if (departureTime.toLowerCase() === "cancel") {
+                return;
+            }
             var arrivalTime = prompt("Enter arrival time:", arrivalTime);
+            if (arrivalTime.toLowerCase() === "cancel") {
+                return;
+            }
             var toc = prompt("Enter TOC:", toc);
+            if (toc.toLowerCase() === "cancel") {
+                return;
+            }
             var from = prompt("Enter departure location:", from);
+            if (from.toLowerCase() === "cancel") {
+                return;
+            }
             var to = prompt("Enter arrival location:", to);
+            if (to.toLowerCase() === "cancel") {
+                return;
+            }
             var travelClass = prompt("Enter class:", travelClass);
+            if (travelClass.toLowerCase() === "cancel") {
+                return;
+            }
             var note = prompt("Enter a note:", note);
-        
+            if (note.toLowerCase() === "cancel") {
+                return;
+            }    var arrivalTime = prompt("Enter arrival time:", arrivalTime);
+            if (arrivalTime.toLowerCase() === "cancel") {
+                return;
+            }
+            var toc = prompt("Enter TOC:", toc);
+            if (toc.toLowerCase() === "cancel") {
+                return;
+            }
+            var from = prompt("Enter departure location:", from);
+            if (from.toLowerCase() === "cancel") {
+                return;
+            }
+            var to = prompt("Enter arrival location:", to);
+            if (to.toLowerCase() === "cancel") {
+                return;
+            }
+            var travelClass = prompt("Enter class:", travelClass);
+            if (travelClass.toLowerCase() === "cancel") {
+                return;
+            }
+            var note = prompt("Enter a note:", note);
+            if (note.toLowerCase() === "cancel") {
+                return;
+            }    
             // Get the index of the current day div
             var dayIndex = $(this).closest('.day').index();
         
@@ -226,8 +272,15 @@ $(document).ready(function(){
             if (id.toLowerCase() === "cancel") {
                 return;
             }
+
             var departureTime = prompt("Enter departure time:");
+            if (departureTime.toLowerCase() === "cancel") {
+                return;
+            }
             var arrivalTime = prompt("Enter arrival time:");
+            if (arrivalTime.toLowerCase() === "cancel") {
+                return;
+            }
 
             while (!/^\d{4}$/.test(departureTime) || !/^\d{4}$/.test(arrivalTime)) {
                 if (departureTime.toLowerCase() === "cancel" || arrivalTime.toLowerCase() === "cancel") {
@@ -237,12 +290,26 @@ $(document).ready(function(){
                 departureTime = prompt("Enter departure time:");
                 arrivalTime = prompt("Enter arrival time:");
             }
-            
             var toc = prompt("Enter TOC:");
+            if (toc.toLowerCase() === "cancel") {
+                return;
+            }
             var travelClass = prompt("Enter class:");
+            if (travelClass.toLowerCase() === "cancel") {
+                return;
+            }
             var from = prompt("Enter departure location:");
+            if (from.toLowerCase() === "cancel") {
+                return;
+            }
             var to = prompt("Enter arrival location:");
+            if (to.toLowerCase() === "cancel") {
+                return;
+            }
             var note = prompt("Enter a note:");
+            if (note.toLowerCase() === "cancel") {
+                return;
+            }
 
             while (toc.length > 5 || travelClass.length > 5 || id.length > 10) {
                 alert("Invalid input. Please try again.");

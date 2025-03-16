@@ -14,6 +14,6 @@ This project was intended as a **barebones prototype** and to be created quickly
 
 -----------
 
-***Archived as superseeded by a new WIP project building on this version***
+***Depreceated as superseeded by a new WIP project building on this version***
 
 -----------

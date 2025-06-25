@@ -19,11 +19,28 @@ $(document).ready(function(){
 
     function sortJourneysByStartTime() {
         for (var i = 0; i < travelItinerary.days.length; i++) {
-            travelItinerary.days[i].sort(function(a, b) {
-                return a.departureTime.localeCompare(b.departureTime);
-            });
+            if (Array.isArray(travelItinerary.days[i])) {
+                // Filter out nulls
+                travelItinerary.days[i] = travelItinerary.days[i].filter(item => item !== null);
+
+                travelItinerary.days[i].sort(function(a, b) {
+                    if (a && b && a.departureTime && b.departureTime) {
+                        var aTime = a.departureTime.replace(":", "");
+                        var bTime = b.departureTime.replace(":", "");
+                        if (aTime === bTime) {
+                            return a.id.localeCompare(b.id);
+                        }
+                        return aTime.localeCompare(bTime);
+                    } else {
+                        console.error("Invalid itinerary item (during sort):", a, b);
+                        return 0;
+                    }
+                });
+            }
         }
     }
+
+
 
 
     function startNewButton(){
@@ -100,130 +117,88 @@ $(document).ready(function(){
             }
         }
 
-        function editButtonHandler(){
-            var id = prompt("Enter ID:", id);
-            if (id.toLowerCase() === "cancel") {
-                return;
-            }
-            var departureTime = prompt("Enter departure time:", departureTime);
-            if (departureTime.toLowerCase() === "cancel") {
-                return;
-            }
-            var arrivalTime = prompt("Enter arrival time:", arrivalTime);
-            if (arrivalTime.toLowerCase() === "cancel") {
-                return;
-            }
-            var toc = prompt("Enter TOC:", toc);
-            if (toc.toLowerCase() === "cancel") {
-                return;
-            }
-            var from = prompt("Enter departure location:", from);
-            if (from.toLowerCase() === "cancel") {
-                return;
-            }
-            var to = prompt("Enter arrival location:", to);
-            if (to.toLowerCase() === "cancel") {
-                return;
-            }
-            var travelClass = prompt("Enter class:", travelClass);
-            if (travelClass.toLowerCase() === "cancel") {
-                return;
-            }
-            var note = prompt("Enter a note:", note);
-            if (note.toLowerCase() === "cancel") {
-                return;
-            }    var arrivalTime = prompt("Enter arrival time:", arrivalTime);
-            if (arrivalTime.toLowerCase() === "cancel") {
-                return;
-            }
-            var toc = prompt("Enter TOC:", toc);
-            if (toc.toLowerCase() === "cancel") {
-                return;
-            }
-            var from = prompt("Enter departure location:", from);
-            if (from.toLowerCase() === "cancel") {
-                return;
-            }
-            var to = prompt("Enter arrival location:", to);
-            if (to.toLowerCase() === "cancel") {
-                return;
-            }
-            var travelClass = prompt("Enter class:", travelClass);
-            if (travelClass.toLowerCase() === "cancel") {
-                return;
-            }
-            var note = prompt("Enter a note:", note);
-            if (note.toLowerCase() === "cancel") {
-                return;
-            }    
-            
-            var dayIndex = $(this).closest('.day').index();
-        
-            
-            var itemIndex = $(this).closest('.itineraryItem').index();
-        
-            
-            travelItinerary.days[dayIndex][itemIndex] = {
-                id: id,
-                departureTime: departureTime,
-                arrivalTime: arrivalTime,
-                toc: toc,
-                from: from,
-                to: to,
-                class: travelClass,
-                note: note
-            };
-        
-            
-            var itineraryItem = $(this).closest('.itineraryItem');
-            itineraryItem.find('.departureTime').text(departureTime);
-            itineraryItem.find('.arrivalTime').text(arrivalTime);
-            itineraryItem.find('.detailsBox p:first').html(`${toc} <span>${id}</span> from ${from} to ${to}`);
-            itineraryItem.find('.detailsBox p:last').text(`Note: ${note}`);
+       function editButtonHandler() {
+            var itineraryItemElement = $(this).closest('.itineraryItem');
+            var dayIndex = itineraryItemElement.closest('.day').index();
+            var itemIndex = itineraryItemElement.index();
 
-            this.sortJourneysByStartTime();
-            this.updateUI();
-        };
+            var itinerary = travelItinerary.days[dayIndex][itemIndex];
+
+            $('#formId').val(itinerary.id);
+            $('#formDepartureTime').val(itinerary.departureTime);
+            $('#formArrivalTime').val(itinerary.arrivalTime);
+            $('#formTOC').val(itinerary.toc);
+            $('#formClass').val(itinerary.class);
+            $('#formFrom').val(itinerary.from);
+            $('#formTo').val(itinerary.to);
+            $('#formNote').val(itinerary.note);
+
+            $('#addEditWindow').show().data('dayIndex', dayIndex).data('itemIndex', itemIndex);
+        }
 
         $(".editButton").click(editButtonHandler);
 
-        function updateUI() {
+       function updateUI() {
             $("#daysContainer").empty();
-        
-            
+
             var durationDays = travelItinerary.duration;
             for (var i = 0; i < durationDays; i++) {
                 var dayDiv = $("<div class='day'><div style='display: flex'><h4 style='width: 100%'>Day " + (i + 1) + " </h4><button class='addButton' style='width: auto'>Add</button></div><hr><div class='travelItinerary'></div></div>");
                 $("#daysContainer").append(dayDiv);
             }
-        
-            
+
             for (var i = 0; i < travelItinerary.days.length; i++) {
                 var dayDiv = $(".day").eq(i);
-                for (var j = 0; j < travelItinerary.days[i].length; j++) {
-                    var itinerary = travelItinerary.days[i][j];
-                    var itineraryItem = $("<div class='itineraryItem'>" +
-                    "<div class='timeBox'>" +
-                    "<p class='departureTime'>" + itinerary.departureTime + "</p>" +
-                    "<p class='arrivalTime'>" + itinerary.arrivalTime + "</p>" +
-                    "</div>" +
-                    "<div class='detailsBox'>" +
-                    "<p style='font-style:italic'>" + itinerary.toc + " " + "<span>" + itinerary.id + "</span>" + " " + " from " + itinerary.from + " to " + itinerary.to + "</p>" +
-                    "<p style='margin-right: 15px'>Note: " + itinerary.note + "</p>" +
-                    "</div>" +
-                    "<div class='buttonBox'>" +
-                    "<button class='editButton'>Edit</button>" +
-                    "<button class='deleteButton'>Delete</button>" +
-                    "</div>" +
-                    "</div>");
-                    $(dayDiv).find(".travelItinerary").append(itineraryItem);
+                var travelItineraryDiv = dayDiv.find(".travelItinerary");
+
+                // Clear the travel itinerary div before re-adding items
+                travelItineraryDiv.empty();
+
+                // Ensure that travelItinerary.days[i] is an array and filter out null values
+                if (Array.isArray(travelItinerary.days[i])) {
+                    var validItems = travelItinerary.days[i].filter(item => item !== null);
+
+                    for (var j = 0; j < validItems.length; j++) {
+                        var itinerary = validItems[j];
+
+                        // Validate that the itinerary item exists and has the required properties
+                        if (itinerary && itinerary.departureTime && itinerary.arrivalTime) {
+                            var itineraryItem = $("<div class='itineraryItem'>" +
+                                "<div class='timeBox'>" +
+                                "<p class='departureTime'>" + itinerary.departureTime + "</p>" +
+                                "<p class='arrivalTime'>" + itinerary.arrivalTime + "</p>" +
+                                "</div>" +
+                                "<div class='detailsBox'>" +
+                                "<p style='font-style:italic'>" + itinerary.toc + " " + "<span>" + itinerary.id + "</span>" + " " + " from " + itinerary.from + " to " + itinerary.to + "</p>" +
+                                "<p style='margin-right: 15px'>Note: " + itinerary.note + "</p>" +
+                                "</div>" +
+                                "<div class='buttonBox'>" +
+                                "<button class='editButton'>Edit</button>" +
+                                "<button class='deleteButton'>Delete</button>" +
+                                "</div>" +
+                                "</div>");
+                            travelItineraryDiv.append(itineraryItem);
+                        } else {
+                            console.error("Invalid itinerary item:", itinerary);
+                        }
+                    }
+                } else {
+                    console.error("travelItinerary.days[i] is not an array:", travelItinerary.days[i]);
                 }
             }
-        
-            
+
             $(".editButton").click(editButtonHandler);
-            $(".deleteButton").click(deleteButtonHandler);
+            $(".deleteButton").click(deleteButtonHandler); 
+            $('.addButton').off('click').on('click', function() {
+                var dayIndex = $(this).closest('.day').index();
+                $('#addEditWindow').show().data('dayIndex', dayIndex);
+                $('#addEditForm')[0].reset();
+            });
         }
+
+
+
+
 
         $(".startNewButton").click(function(){
             if (!confirm("Are you sure you want to start a new itinerary?")) {
@@ -254,7 +229,15 @@ $(document).ready(function(){
             updateUI();
         };
         
+        $(".editButton").click(editButtonHandler);
         $(".deleteButton").click(deleteButtonHandler);
+        $('.addButton').off('click').on('click', function() {
+            var dayIndex = $(this).closest('.day').index();
+            $('#addEditWindow').show().data('dayIndex', dayIndex);
+            $('#addEditForm')[0].reset();
+        });
+
+
 
         
         
@@ -274,37 +257,47 @@ $('#formCancelButton').off('click').on('click', function() {
 });
 
 
-// Modal submit handler
 $('#addEditForm').off('submit').on('submit', function(e) {
-    e.preventDefault();
-    var dayIndex = $('#addEditWindow').data('dayIndex');
-    var id = $('#formId').val().trim();
-    var departureTime = $('#formDepartureTime').val().trim();
-    var arrivalTime = $('#formArrivalTime').val().trim();
-    var toc = $('#formTOC').val().trim();
-    var travelClass = $('#formClass').val().trim();
-    var from = $('#formFrom').val().trim();
-    var to = $('#formTo').val().trim();
-    var note = $('#formNote').val().trim();
+        e.preventDefault();
+        var dayIndex = $('#addEditWindow').data('dayIndex');
+        var id = $('#formId').val().trim();
+        var departureTime = $('#formDepartureTime').val().trim();
+        var arrivalTime = $('#formArrivalTime').val().trim();
+        var toc = $('#formTOC').val().trim();
+        var travelClass = $('#formClass').val().trim();
+        var from = $('#formFrom').val().trim();
+        var to = $('#formTo').val().trim();
+        var note = $('#formNote').val().trim();
 
-    // Simple validation
-    if (!/^\d{4}$/.test(departureTime) || !/^\d{4}$/.test(arrivalTime)) {
-        alert("Times must be in 4-digit format (e.g. 0900).");
-        return;
-    }
-    if (toc.length > 5 || travelClass.length > 5 || id.length > 10) {
-        alert("TOC and Class max 5 chars, ID max 10 chars.");
-        return;
-    }
+        if (!/^\d{4}$/.test(departureTime) || !/^\d{4}$/.test(arrivalTime)) {
+            alert("Times must be in 4-digit format (e.g., 0900).");
+            return;
+        }
+        if (toc.length > 5 || travelClass.length > 5 || id.length > 10) {
+            alert("TOC and Class max 5 chars, ID max 10 chars.");
+            return;
+        }
 
-    if (!travelItinerary.days[dayIndex]) travelItinerary.days[dayIndex] = [];
-    travelItinerary.days[dayIndex].push({
-        id, departureTime, arrivalTime, toc, class: travelClass, from, to, note
+        var itineraryItem = {
+            id: id,
+            departureTime: departureTime,
+            arrivalTime: arrivalTime,
+            toc: toc,
+            class: travelClass,
+            from: from,
+            to: to,
+            note: note
+        };
+
+        if (!travelItinerary.days[dayIndex]) {
+            travelItinerary.days[dayIndex] = [];
+        }
+        travelItinerary.days[dayIndex].push(itineraryItem);
+
+        $('#addEditWindow').hide();
+        sortJourneysByStartTime();
+        updateUI();
     });
-
-    $('#addEditWindow').hide();
-    nextButton();
-});
 
 
     }

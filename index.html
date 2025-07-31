@@ -65,6 +65,11 @@
         <input type="text" id="formFrom" placeholder="From" required>
         <input type="text" id="formTo" placeholder="To" required>
         <input type="text" id="formNote" placeholder="Note" maxlength="200">
+
+        <h3>Calling Points</h3>
+        <div id="callingPointsContainer">
+            </div>
+        <button type="button" id="addCallingPointButton" style="background: #007bff; color: white;">Add Calling Point</button>
         <div style="display: flex; gap: 1rem;">
             <button type="submit" id="formSubmitButton" style="width: 100%;">Add</button>
             <button type="button" id="formCancelButton" style="background: #aaa; width: 100%;">Cancel</button>
@@ -100,7 +105,7 @@
     </div>
 </div>
 
-    <style>
+  <style>
         body {
             font-family: 'Roboto', sans-serif;
             height: 100vh;
@@ -253,6 +258,7 @@
             padding: 10px;
             border: 1px solid #ccc;
             margin-bottom: 10px;
+            flex-wrap: wrap; 
         }
         .timeBox {
             flex-basis: auto; 
@@ -319,7 +325,7 @@
         }
 
         td{
-            font-size: 10px;
+            font-size: 13px;
         }
 
         .space{
@@ -338,8 +344,88 @@
         .addEditWindow[style*="display: block"] {
             display: flex !important;
         }
-    
+
+
+        #addEditForm input[type="text"],
+        #addEditForm input[type="date"],
+        #addEditForm textarea {
+            flex: 1;
+            padding: 0.5rem;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            font-size: 14px;
+            width: auto; 
+            margin: 0; 
+            box-sizing: border-box; 
+        }
+
+       
+        #addEditForm h2, #addEditForm h3 {
+            margin-top: 0;
+            margin-bottom: 10px;
+            width: 100%; 
+        }
+
+
+        .callingPointInput {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 5px;
+            align-items: center;
+            width: 100%; 
+        }
+        .callingPointInput input {
+            flex: 1;
+            padding: 0.5rem;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+        .callingPointInput button {
+            width: auto;
+            padding: 0.3rem 0.6rem;
+            font-size: 14px;
+            background: #dc3545;
+        }
+        .callingPointInput button:hover {
+            background: #c82333;
+        }
+        .callingPointsDisplay {
+            margin-top: 5px;
+            padding-left: 20px;
+            font-size: 0.9em;
+        }
+        .callingPointsDisplay p {
+            margin: 2px 0;
+        }
+
+        .calling-point-row td {
+            font-size: 9px; 
+            color: #555;
+            font-style:italic
+        }
+
+        #addEditForm{
+            max-height: 60vh;
+            overflow-y:scroll;
+        }
+
+        @media screen and (max-width: 600px){
+          
+            .callingPointInput {
+                flex-direction: column; 
+                gap: 5px; 
+                align-items: stretch; 
+            }
+            .callingPointInput input {
+                width: 100%; 
+            }
+            .callingPointInput button {
+                width: 100%; 
+                margin-top: 5px; 
+            }
+}
     </style>
 </body>
 </html>
-

@@ -20,7 +20,6 @@ $(document).ready(function(){
     function sortJourneysByStartTime() {
         for (var i = 0; i < travelItinerary.days.length; i++) {
             if (Array.isArray(travelItinerary.days[i])) {
-                // Filter out nulls
                 travelItinerary.days[i] = travelItinerary.days[i].filter(item => item !== null);
 
                 travelItinerary.days[i].sort(function(a, b) {
@@ -39,9 +38,6 @@ $(document).ready(function(){
             }
         }
     }
-
-
-
 
     function startNewButton(){
         travelItinerary = {
@@ -64,7 +60,6 @@ $(document).ready(function(){
         $("#startScreen").show();
     }
     
-
     function nextButton(){
         $("#startScreen").hide();
         $("#planningScreen").show();
@@ -72,7 +67,6 @@ $(document).ready(function(){
         sortJourneysByStartTime();
         updateUI();
     
-
         document.title = travelItinerary.name || "My generated trip" + (travelItinerary.startDate ? " from " + travelItinerary.startDate : "") + (travelItinerary.endDate ? " to " + travelItinerary.endDate : "");
 
         var startDate = new Date(travelItinerary.startDate);
@@ -94,7 +88,6 @@ $(document).ready(function(){
             $("#daysContainer").append(dayDiv);
         }
 
-
         for (var i = 0; i < travelItinerary.days.length; i++) {
             var dayDiv = $(".day").eq(i);
             for (var j = 0; j < travelItinerary.days[i].length; j++) {
@@ -107,6 +100,7 @@ $(document).ready(function(){
                 "<div class='detailsBox'>" +
                 "<p style='font-style:italic'>" + itinerary.toc + " " + "<span>" + itinerary.id + "</span>" + " " + " from " + itinerary.from + " to " + itinerary.to + "</p>" +
                 "<p style='margin-right: 15px'>Note: " + itinerary.note + "</p>" +
+                "<div class='callingPointsDisplay'></div>" +
                 "</div>" +
                 "<div class='buttonBox'>" +
                 "<button class='editButton'>Edit</button>" +
@@ -133,6 +127,16 @@ $(document).ready(function(){
             $('#formTo').val(itinerary.to);
             $('#formNote').val(itinerary.note);
 
+            
+            $('#callingPointsContainer').empty(); 
+            if (itinerary.callingPoints && itinerary.callingPoints.length > 0) {
+                itinerary.callingPoints.forEach(function(point) {
+                    addCallingPointField(point.location, point.arrivalTime, point.departureTime);
+                });
+            } else {
+                addCallingPointField(); 
+            }
+
             $('#addEditWindow').show().data('dayIndex', dayIndex).data('itemIndex', itemIndex);
         }
 
@@ -151,17 +155,14 @@ $(document).ready(function(){
                 var dayDiv = $(".day").eq(i);
                 var travelItineraryDiv = dayDiv.find(".travelItinerary");
 
-                // Clear the travel itinerary div before re-adding items
                 travelItineraryDiv.empty();
 
-                // Ensure that travelItinerary.days[i] is an array and filter out null values
                 if (Array.isArray(travelItinerary.days[i])) {
                     var validItems = travelItinerary.days[i].filter(item => item !== null);
 
                     for (var j = 0; j < validItems.length; j++) {
                         var itinerary = validItems[j];
 
-                        // Validate that the itinerary item exists and has the required properties
                         if (itinerary && itinerary.departureTime && itinerary.arrivalTime) {
                             var itineraryItem = $("<div class='itineraryItem'>" +
                                 "<div class='timeBox'>" +
@@ -171,12 +172,22 @@ $(document).ready(function(){
                                 "<div class='detailsBox'>" +
                                 "<p style='font-style:italic'>" + itinerary.toc + " " + "<span>" + itinerary.id + "</span>" + " " + " from " + itinerary.from + " to " + itinerary.to + "</p>" +
                                 "<p style='margin-right: 15px'>Note: " + itinerary.note + "</p>" +
+                                "<div class='callingPointsDisplay'></div>" + 
                                 "</div>" +
                                 "<div class='buttonBox'>" +
                                 "<button class='editButton'>Edit</button>" +
                                 "<button class='deleteButton'>Delete</button>" +
                                 "</div>" +
                                 "</div>");
+                            
+                            
+                            var callingPointsDisplay = itineraryItem.find('.callingPointsDisplay');
+                            if (itinerary.callingPoints && itinerary.callingPoints.length > 0) {
+                                itinerary.callingPoints.forEach(function(point) {
+                                    callingPointsDisplay.append("<p>" + point.location + " (Arr: " + point.arrivalTime + ", Dep: " + point.departureTime + ")</p>");
+                                });
+                            }
+
                             travelItineraryDiv.append(itineraryItem);
                         } else {
                             console.error("Invalid itinerary item:", itinerary);
@@ -191,14 +202,12 @@ $(document).ready(function(){
             $(".deleteButton").click(deleteButtonHandler); 
             $('.addButton').off('click').on('click', function() {
                 var dayIndex = $(this).closest('.day').index();
-                $('#addEditWindow').show().data('dayIndex', dayIndex);
+                $('#addEditWindow').show().data('dayIndex', dayIndex).removeData('itemIndex'); 
                 $('#addEditForm')[0].reset();
+                $('#callingPointsContainer').empty(); 
+                addCallingPointField(); 
             });
         }
-
-
-
-
 
         $(".startNewButton").click(function(){
             if (!confirm("Are you sure you want to start a new itinerary?")) {
@@ -207,22 +216,15 @@ $(document).ready(function(){
             startNewButton();
         });
 
-        
         function deleteButtonHandler(){
-            
             if (!confirm("Are you sure you want to delete this item?")) {
                 return;
             }
             
-            
             var dayIndex = $(this).closest('.day').index();
-            
-            
             var itemIndex = $(this).closest('.itineraryItem').index();
             
-            
             travelItinerary.days[dayIndex].splice(itemIndex, 1);
-            
             
             $(this).closest('.itineraryItem').remove();
             sortJourneysByStartTime();
@@ -233,25 +235,38 @@ $(document).ready(function(){
         $(".deleteButton").click(deleteButtonHandler);
         $('.addButton').off('click').on('click', function() {
             var dayIndex = $(this).closest('.day').index();
-            $('#addEditWindow').show().data('dayIndex', dayIndex);
+            $('#addEditWindow').show().data('dayIndex', dayIndex).removeData('itemIndex'); 
             $('#addEditForm')[0].reset();
+            $('#callingPointsContainer').empty(); 
+            addCallingPointField(); 
+        });
+
+        
+        function addCallingPointField(location = '', arrival = '', departure = '') {
+            
+            var fieldHtml = `
+                <div class="callingPointInput">
+                    <input type="text" placeholder="Location" class="calling-location" value="${location}" required>
+                    <input type="text" placeholder="Arr (e.g. 0900 or N/A)" class="calling-arrival" value="${arrival}" required>
+                    <input type="text" placeholder="Dep (e.g. 0905 or N/A)" class="calling-departure" value="${departure}" required>
+                    <button type="button" class="removeCallingPointButton">X</button>
+                </div>
+            `;
+            $('#callingPointsContainer').append(fieldHtml);
+        }
+
+        
+        $('#addCallingPointButton').off('click').on('click', function() {
+            addCallingPointField();
+        });
+
+        
+        $('#callingPointsContainer').off('click', '.removeCallingPointButton').on('click', '.removeCallingPointButton', function() {
+            $(this).closest('.callingPointInput').remove();
         });
 
 
 
-        
-        
-        
-        
-
-$('.addButton').off('click').on('click', function() {
-    var dayIndex = $(this).closest('.day').index();
-    $('#addEditWindow').show().data('dayIndex', dayIndex);
-    $('#addEditForm')[0].reset();
-});
-
-
-// Modal cancel button
 $('#formCancelButton').off('click').on('click', function() {
     $('#addEditWindow').hide();
 });
@@ -260,6 +275,8 @@ $('#formCancelButton').off('click').on('click', function() {
 $('#addEditForm').off('submit').on('submit', function(e) {
         e.preventDefault();
         var dayIndex = $('#addEditWindow').data('dayIndex');
+        var itemIndex = $('#addEditWindow').data('itemIndex'); 
+
         var id = $('#formId').val().trim();
         var departureTime = $('#formDepartureTime').val().trim();
         var arrivalTime = $('#formArrivalTime').val().trim();
@@ -269,12 +286,43 @@ $('#addEditForm').off('submit').on('submit', function(e) {
         var to = $('#formTo').val().trim();
         var note = $('#formNote').val().trim();
 
+        
         if (!/^\d{4}$/.test(departureTime) || !/^\d{4}$/.test(arrivalTime)) {
-            alert("Times must be in 4-digit format (e.g., 0900).");
+            alert("Departure and Arrival Times for the main leg must be in 4-digit format (e.g., 0900).");
             return;
         }
         if (toc.length > 5 || travelClass.length > 5 || id.length > 10) {
             alert("TOC and Class max 5 chars, ID max 10 chars.");
+            return;
+        }
+
+        var callingPoints = [];
+        let hasInvalidCallingPointTime = false;
+        $('#callingPointsContainer .callingPointInput').each(function() {
+            var cpLocation = $(this).find('.calling-location').val().trim();
+            var cpArrival = $(this).find('.calling-arrival').val().trim();
+            var cpDeparture = $(this).find('.calling-departure').val().trim();
+
+            if (cpLocation || cpArrival || cpDeparture) { 
+                
+                const isCpArrivalValid = /^\d{4}$/.test(cpArrival) || cpArrival !== '';
+                const isCpDepartureValid = /^\d{4}$/.test(cpDeparture) || cpDeparture !== '';
+
+                if (!isCpArrivalValid || !isCpDepartureValid) {
+                    hasInvalidCallingPointTime = true;
+                    return false; 
+                }
+
+                callingPoints.push({
+                    location: cpLocation,
+                    arrivalTime: cpArrival,
+                    departureTime: cpDeparture
+                });
+            }
+        });
+
+        if (hasInvalidCallingPointTime) {
+            alert("All Calling Point Arrival and Departure times must either be a 4-digit number (e.g., 0900) or a non-empty string (e.g., N/A).");
             return;
         }
 
@@ -286,25 +334,30 @@ $('#addEditForm').off('submit').on('submit', function(e) {
             class: travelClass,
             from: from,
             to: to,
-            note: note
+            note: note,
+            callingPoints: callingPoints 
         };
 
         if (!travelItinerary.days[dayIndex]) {
             travelItinerary.days[dayIndex] = [];
         }
-        travelItinerary.days[dayIndex].push(itineraryItem);
+
+        if (itemIndex !== undefined) {
+            
+            travelItinerary.days[dayIndex][itemIndex] = itineraryItem;
+        } else {
+            
+            travelItinerary.days[dayIndex].push(itineraryItem);
+        }
 
         $('#addEditWindow').hide();
         sortJourneysByStartTime();
         updateUI();
     });
 
-
     }
 
-
     $("#nextButton").click(function(){
-        
         travelItinerary.name = $("#nameField").val();
         travelItinerary.description = $("#descField").val();
         travelItinerary.startDate = $("#startDateField").val();
@@ -312,17 +365,16 @@ $('#addEditForm').off('submit').on('submit', function(e) {
 
         nextButton();
     });
+
     $("#backButton").click(function(){
         $("#planningScreen").hide();
         $("#startScreen").show();
     });
 
     $('#finishButton').click(function(){
-
         if (!confirm("Are you sure you want to finish planning?")) {
             return;
         }
-
         
         $("#printTitle").text(travelItinerary.name.toUpperCase() || "MY GENERATED TRIP");
         $("#printDescription").text((travelItinerary.description.toUpperCase() || "GENERATED " + new Date().toLocaleDateString()));
@@ -330,39 +382,46 @@ $('#addEditForm').off('submit').on('submit', function(e) {
         $("#printFrom").text(travelItinerary.startDate.toUpperCase());
         $("#printTo").text(travelItinerary.endDate.toUpperCase());
 
-        
-
         $("#tableSection table").remove();
 
         var table = $('<table>');
         table.append('<tr><th class="short">ID</th><th class="short">DEP</th><th class="short">ARR</th><th class="long">FROM</th><th class="long">TO</th><th class="short">TOC</th><th class="long">NOTE</th></tr>');
         var dayNumber = 1;
         travelItinerary.days.forEach(function(day) {
-            
             var dayRow = $('<tr>').append('<td colspan="8">Day ' + dayNumber + '</td>');
             table.append(dayRow);
         
             day.forEach(function(itinerary) {
-            var row = $('<tr>');
-            row.append('<td class="short">' + itinerary.id + '</td>');
-            row.append('<td class="short">' + itinerary.departureTime + '</td>');
-            row.append('<td class="short">' + itinerary.arrivalTime + '</td>');
-            row.append('<td class="long">' + itinerary.from + '</td>');
-            row.append('<td class="long">' + itinerary.to + '</td>');
-            row.append('<td class="short">' + itinerary.toc + '</td>');
-            
-            row.append('<td class="note">' + itinerary.note + '</td>');
-            table.append(row);
+                var row = $('<tr>');
+                row.append('<td class="short">' + itinerary.id + '</td>');
+                row.append('<td class="short">dep ' + itinerary.departureTime + '</td>');
+                row.append('<td class="short">arr ' + itinerary.arrivalTime + '</td>');
+                row.append('<td class="long">' + itinerary.from + '</td>');
+                row.append('<td class="long">' + itinerary.to + '</td>');
+                row.append('<td class="short">' + itinerary.toc + '</td>');
+                row.append('<td class="note">' + itinerary.note + '</td>');
+                table.append(row);
+
+                if (itinerary.callingPoints && itinerary.callingPoints.length > 0) {
+                    itinerary.callingPoints.forEach(function(point) {
+                        var cpRow = $('<tr class="calling-point-row">');
+                        cpRow.append('<td class="short"></td>'); 
+                        cpRow.append('<td class="short">arr ' + point.arrivalTime + '</td>');
+                        cpRow.append('<td class="short">dep ' + point.departureTime + '</td>');
+                        cpRow.append('<td class="long">' + point.location + '</td>');
+                        cpRow.append('<td class="long"></td>');
+                        cpRow.append('<td class="short"></td>'); 
+                        cpRow.append('<td class="long">IS</td>'); 
+                        table.append(cpRow);
+                    });
+                }
             });
-        
             dayNumber++;
         });
 
-        
         var spareRowTitle = $('<tr>').append('<td colspan="8">Spare Row</td>');
         table.append(spareRowTitle);
 
-        
         for (var i = 0; i < 12; i++) {
             var emptyRow = $('<tr>');
             emptyRow.append('<td class="short space"></td>');
@@ -375,20 +434,12 @@ $('#addEditForm').off('submit').on('submit', function(e) {
             table.append(emptyRow);
         }
 
-
-
         $('#tableSection').append(table);
 
         $("#planningScreen").hide();
         $("#finalScreen").show();
-
         
         localStorage.setItem('travelItinerary', JSON.stringify(travelItinerary));
-
-
-
-
-
         console.log(travelItinerary);
     });
 
@@ -399,13 +450,11 @@ $('#addEditForm').off('submit').on('submit', function(e) {
 
     $('#printButton').click(function(){
         document.title = travelItinerary.name || "My generated trip" + (travelItinerary.startDate ? " from " + travelItinerary.startDate : "") + (travelItinerary.endDate ? " to " + travelItinerary.endDate : "");
-        $('#printNavigationButtons').addClass('hidden');
-        
+        $('#printNavigationButtons').addClass('no-print'); 
         
         setTimeout(function() {
             window.print();
-            
-            $('#printNavigationButtons').removeClass('hidden');
+            $('#printNavigationButtons').removeClass('no-print');
         }, 0);
     });
 
@@ -418,15 +467,10 @@ $('#addEditForm').off('submit').on('submit', function(e) {
             $("#descField").val(travelItinerary.description);
             $("#startDateField").val(travelItinerary.startDate);
             $("#endDateField").val(travelItinerary.endDate);
-
-
-            
         } catch (e) {
             alert("Invalid JSON data.");
             return;
         }
-        
-
         nextButton();
     });
 
@@ -444,7 +488,6 @@ $('#addEditForm').off('submit').on('submit', function(e) {
         setTimeout(() => {
             $('#saveToJson').text("Copy as string");
         }, 5000);
-   
     });
 
 });
